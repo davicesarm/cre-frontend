@@ -13,10 +13,18 @@ export default function SubjectsForm({
   }, [subjects]);
 
   const handleInputChange = (subjectName: string, value: string) => {
-    setGrades((prevGrades) => ({
-      ...prevGrades,
-      [subjectName]: parseFloat(value) || 0,
-    }));
+    if (value === "") {
+      setGrades((prevGrades) => {
+        const newGrades = { ...prevGrades };
+        delete newGrades[subjectName];
+        return newGrades;
+      });
+    } else {
+      setGrades((prevGrades) => ({
+        ...prevGrades,
+        [subjectName]: parseFloat(value) || 0,
+      }));
+    }
   };
 
   const calculateCre = (event: React.FormEvent) => {
@@ -25,9 +33,11 @@ export default function SubjectsForm({
     let totalWeights = 0;
 
     subjects.forEach((subject) => {
-      const grade = grades[subject.name] || 0;
-      totalWeightedGrades += grade * subject.weight;
-      totalWeights += subject.weight;
+      const grade = grades[subject.nome_materia];
+      if (grade !== undefined) {
+        totalWeightedGrades += grade * subject.ch;
+        totalWeights += subject.ch;
+      }
     });
 
     const calculatedCre =
@@ -41,17 +51,24 @@ export default function SubjectsForm({
       <h2 className="text-center mb-3">Preencha as notas</h2>
       <div className="w-full grid grid-cols-2 gap-2">
         {subjects.map((subject, index) => (
-          <div key={index}>
-            <h3 className="text-xs truncate mb-2 ml-2">{subject.name}</h3>
+          <div key={index} className="flex flex-col h-full">
+            <h3 className="text-xs line-clamp-2 mb-2 ml-2 flex-1">
+              {subject.nome_materia}
+            </h3>
             <input
               type="text"
-              name={subject.name}
-              id={subject.name}
-              title={subject.name}
-              value={grades[subject.name] || ""}
+              name={subject.nome_materia}
+              id={subject.id_materia.toString()}
+              title={subject.nome_materia}
+              value={
+                grades[subject.nome_materia] === 0
+                  ? "0"
+                  : grades[subject.nome_materia] || ""
+              }
               className="w-full text-sm focus:outline-none border focus:border-neutral-500 border-neutral-700 py-1 px-4 bg-neutral-800 rounded-full"
-              onChange={(e) => handleInputChange(subject.name, e.target.value)}
-              required
+              onChange={(e) =>
+                handleInputChange(subject.nome_materia, e.target.value)
+              }
             />
           </div>
         ))}

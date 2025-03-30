@@ -1,11 +1,12 @@
-import { useState } from "react";
-
 export default function SelectSemester({
   semesters,
+  selectedSemester,
   onSelect,
-}: Readonly<{ semesters: number[]; onSelect: (semester: number) => void }>) {
-  const [selectedSemester, setSelectedSemester] = useState<number>(1);
-
+}: Readonly<{
+  semesters: number[];
+  selectedSemester: number;
+  onSelect: (semester: number) => void;
+}>) {
   return (
     <div className="flex flex-col items-center w-2xs">
       <h2 className="text-center mb-2">Selecione o período</h2>
@@ -20,10 +21,7 @@ export default function SelectSemester({
                 name="semester"
                 className="hidden peer"
                 checked={selectedSemester === semester}
-                onChange={() => {
-                  onSelect(semester);
-                  setSelectedSemester(semester);
-                }}
+                onChange={() => onSelect(semester)}
                 required
               />
               <label

@@ -2,15 +2,18 @@
 
 import { useEffect, useRef, useState } from "react";
 import ShowCourses from "./ShowCourses";
-import { CourseData } from "@/types/types";
+import { CourseData, CourseDetailed } from "@/types/types";
 
 export default function SearchCourse({
   courses,
   onSelect,
-}: Readonly<{ courses: string[]; onSelect: (course: CourseData) => void }>) {
-  const [filteredCourses, setFilteredCourses] = useState<string[]>([]);
+}: Readonly<{
+  courses: CourseData[];
+  onSelect: (course: CourseDetailed) => void;
+}>) {
+  const [filteredCourses, setFilteredCourses] = useState<CourseData[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
-  const [selectedCourse, setSelectedCourse] = useState<string>("");
+  const [selectedCourse, setSelectedCourse] = useState<CourseData | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filterCourses = (inputValue: string) => {
@@ -18,82 +21,43 @@ export default function SearchCourse({
       setFilteredCourses([]);
       return;
     }
-    const filtered = courses.filter((course) =>
-      course.toLowerCase().includes(inputValue.toLowerCase())
-    );
+    const filtered = courses
+      .filter((course) =>
+        course.nome_curso.toLowerCase().includes(inputValue.toLowerCase())
+      )
+      .sort((a, b) => {
+        const aLower = a.nome_curso.toLowerCase();
+        const bLower = b.nome_curso.toLowerCase();
+        const inputLower = inputValue.toLowerCase();
+
+        const aStartsWith = aLower.startsWith(inputLower);
+        const bStartsWith = bLower.startsWith(inputLower);
+
+        if (aStartsWith && !bStartsWith) return -1;
+        if (!aStartsWith && bStartsWith) return 1;
+
+        return aLower.localeCompare(bLower);
+      });
+
     setFilteredCourses(filtered);
   };
 
   useEffect(() => {
     if (!selectedCourse) return;
-    const sistemas = {
-      name: "Sistemas para internet",
-      semesters: [
-        {
-          semester: 1,
-          subjects: [
-            {
-              name: "Banco de Dados I ",
-              weight: 80,
-            },
-            { name: "Ciência, Tecnologia e Meio Ambiente ", weight: 40 },
-            {
-              name: "Estruturas de Dados ",
-              weight: 80,
-            },
-            { name: "Fundamentos da Metodologia", weight: 40 },
-            {
-              name: "Linguagens de Script ",
-              weight: 80,
-            },
-            {
-              name: "Protocolos de Interconexão de Redes de Computadores ",
-              weight: 80,
-            },
-            { name: "Sistemas Operacionais", weight: 100 },
-          ],
-        },
-        {
-          semester: 2,
-          subjects: [
-            { name: "Banco", weight: 100 },
-            { name: "Pweb", weight: 40 },
-            { name: "Poo", weight: 80 },
-          ],
-        },
-      ],
-    };
-    const adm = {
-      name: "Administraçao",
-      semesters: [
-        {
-          semester: 1,
-          subjects: [
-            { name: "Sla", weight: 80 },
-            { name: "dinheiro", weight: 90 },
-            { name: "economia", weight: 80 },
-          ],
-        },
-        {
-          semester: 2,
-          subjects: [
-            { name: "ota coisa", weight: 100 },
-            { name: "teste", weight: 40 },
-            { name: "som", weight: 80 },
-          ],
-        },
-      ],
-    };
-    if (selectedCourse === "Sistemas para internet") {
-      onSelect(sistemas);
-    } else onSelect(adm);
-    inputRef.current!.value = selectedCourse;
+
+    fetch(
+      `${process.env.NEXT_PUBLIC_API_LINK}/curso/id/${selectedCourse.id_curso}`
+    )
+      .then((response) => response.json())
+      .then((courseData) => onSelect(courseData));
+
+    inputRef.current!.value = selectedCourse.nome_curso;
   }, [selectedCourse]);
 
   return (
     <div className="w-2xs flex flex-col items-center">
       <h2 className="mb-2 text-center w-full">
-        {selectedCourse || "Selecione seu curso"}
+        {selectedCourse?.nome_curso || "Selecione seu curso"}
       </h2>
       <div className="relative w-full">
         <input
@@ -105,9 +69,9 @@ export default function SearchCourse({
           onFocus={() => setShowResults(true)}
         />
         {filteredCourses.length > 0 && showResults && (
-          <div className="absolute w-full border border-neutral-700 p-2 rounded bg-neutral-800 mt-4">
+          <div className="max-h-96 overflow-x-scroll absolute w-full border border-neutral-700 p-2 rounded bg-neutral-800/75 backdrop-blur mt-2">
             <ShowCourses
-              courses={filteredCourses.slice(0, 8)}
+              courses={filteredCourses.slice(0, 15)}
               onSelect={(course) => {
                 setSelectedCourse(course);
                 inputRef.current?.blur();

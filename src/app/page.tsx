@@ -4,40 +4,43 @@ import SearchCourse from "@/components/SearchCourse";
 import SelectSemester from "@/components/SelectSemester";
 import SubjectsForm from "@/components/SubjectsForm";
 import { useEffect, useState } from "react";
-import { CourseData } from "@/types/types";
+import { CourseDetailed, CourseData } from "@/types/types";
 
 export default function Home() {
-  const cursos = [
-    "Sistemas para internet",
-    "Administração",
-    "Engenharia de software",
-    "Redes de computadores",
-  ];
-
-  const [courseData, setCourseData] = useState<CourseData | null>(null);
+  const [courses, setCourses] = useState<CourseData[]>([]);
+  const [courseData, setCourseData] = useState<CourseDetailed | null>(null);
   const [selectedSemester, setSelectedSemester] = useState<number>(1);
 
   useEffect(() => {
-    if (courseData) console.log("Course data:", courseData);
-  }, [courseData]);
+    fetch(`${process.env.NEXT_PUBLIC_API_LINK}/cursos`)
+      .then((response) => response.json())
+      .then((cursos: { cursos: CourseData[] }) => setCourses(cursos.cursos));
+  }, []);
 
   return (
     <main className="mt-8 flex max-w-xl mx-auto flex-col gap-8 items-center">
-      <SearchCourse courses={cursos} onSelect={setCourseData} />
+      <SearchCourse
+        courses={courses}
+        onSelect={(courseData) => {
+          setCourseData(courseData);
+          setSelectedSemester(1);
+        }}
+      />
       {courseData && (
         <>
           <SelectSemester
-            semesters={courseData.semesters.map((semester) => {
-              return semester.semester;
+            semesters={courseData.periodos.map((semester) => {
+              return semester.periodo;
             })}
+            selectedSemester={selectedSemester}
             onSelect={setSelectedSemester}
           />
 
           <SubjectsForm
             subjects={
-              courseData.semesters.find((semester) => {
-                return semester.semester === selectedSemester;
-              })?.subjects || []
+              courseData.periodos.find((semester) => {
+                return semester.periodo === selectedSemester;
+              })?.materias || []
             }
           />
         </>
