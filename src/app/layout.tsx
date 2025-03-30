@@ -24,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} h-svh flex flex-col bg-neutral-200 text-neutral-900 dark:bg-neutral-900 dark:text-neutral-200`}>
+        className={`${inter.className} h-svh flex flex-col bg-neutral-900 text-neutral-200`}>
         <Header />
         {children}
         <Footer />
