@@ -3,7 +3,7 @@
 import SearchCourse from "@/components/SearchCourse";
 import SelectSemester from "@/components/SelectSemester";
 import SubjectsForm from "@/components/SubjectsForm";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { CourseDetailed, CourseData } from "@/types/types";
 
 export default function Home() {
@@ -21,10 +21,10 @@ export default function Home() {
     <main className="mt-8 flex max-w-xl mx-auto flex-col gap-8 items-center">
       <SearchCourse
         courses={courses}
-        onSelect={(courseData) => {
+        onSelect={useCallback((courseData) => {
           setCourseData(courseData);
           setSelectedSemester(1);
-        }}
+        }, [])}
       />
       {courseData && (
         <>
