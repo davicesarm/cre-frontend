@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import ShowCourses from "./ShowCourses";
 import { CourseData, CourseDetailed } from "@/types/types";
+import { IoSearch, IoClose } from "react-icons/io5";
 
 export default function SearchCourse({
   courses,
@@ -14,6 +15,7 @@ export default function SearchCourse({
   const [filteredCourses, setFilteredCourses] = useState<CourseData[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [selectedCourse, setSelectedCourse] = useState<CourseData | null>(null);
+  const [inputValue, setInputValue] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   const filterCourses = (inputValue: string) => {
@@ -23,7 +25,9 @@ export default function SearchCourse({
     }
     const filtered = courses
       .filter((course) =>
-        course.nome_curso.toLowerCase().includes(inputValue.toLowerCase())
+        course.nome_curso
+          .toLowerCase()
+          .includes(inputValue.trim().toLowerCase())
       )
       .sort((a, b) => {
         const aLower = a.nome_curso.toLowerCase();
@@ -51,8 +55,12 @@ export default function SearchCourse({
       .then((response) => response.json())
       .then((courseData) => onSelect(courseData));
 
-    inputRef.current!.value = selectedCourse.nome_curso;
+    setInputValue(selectedCourse.nome_curso);
   }, [selectedCourse]);
+
+  useEffect(() => {
+    filterCourses(inputValue);
+  }, [inputValue]);
 
   return (
     <div className="w-2xs flex flex-col items-center">
@@ -60,16 +68,29 @@ export default function SearchCourse({
         {selectedCourse?.nome_curso || "Selecione seu curso"}
       </h2>
       <div className="relative w-full">
-        <input
-          ref={inputRef}
-          className="w-full text-sm focus:outline-none border focus:border-neutral-500 border-neutral-700 py-2 px-4 bg-neutral-800 rounded-full"
-          type="text"
-          onChange={(e) => filterCourses(e.target.value)}
-          onBlur={() => setShowResults(false)}
-          onFocus={() => setShowResults(true)}
-        />
+        <div className="relative">
+          <input
+            ref={inputRef}
+            className="w-full text-sm focus:outline-none border focus:border-neutral-500 border-neutral-700 py-2 px-4 bg-neutral-800 rounded-full"
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            onBlur={() => setShowResults(false)}
+            onFocus={() => setShowResults(true)}
+          />
+          <div className="text-neutral-400 absolute end-4 top-1/2 -translate-y-1/2 flex">
+            {(inputValue && (
+              <IoClose
+                className="hover:cursor-pointer"
+                onClick={() => {
+                  setInputValue("");
+                }}
+              />
+            )) || <IoSearch />}
+          </div>
+        </div>
         {filteredCourses.length > 0 && showResults && (
-          <div className="max-h-96 overflow-x-scroll absolute w-full border border-neutral-700 p-2 rounded bg-neutral-800/75 backdrop-blur mt-2">
+          <div className="z-10 max-h-96 overflow-y-scroll absolute w-full border border-neutral-700 p-2 rounded bg-neutral-800/75 backdrop-blur mt-2">
             <ShowCourses
               courses={filteredCourses.slice(0, 15)}
               onSelect={(course) => {

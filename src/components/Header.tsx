@@ -11,8 +11,8 @@ export default function Header() {
         }}
         className="hover:cursor-pointer"
         src="/ifpb-logo.svg"
-        width={30}
-        height={30}
+        width={40}
+        height={40}
         alt="ifpb logo"
       />
       <div>
