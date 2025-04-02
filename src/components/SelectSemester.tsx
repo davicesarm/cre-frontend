@@ -10,7 +10,7 @@ export default function SelectSemester({
   return (
     <div className="flex flex-col items-center w-2xs">
       <h2 className="text-center mb-2">Selecione o período</h2>
-      <ul className="justify-center flex w-full gap-4 flex-wrap">
+      <ul className="select-none justify-center flex w-full gap-4 flex-wrap">
         {semesters.map((semester) => {
           return (
             <li key={semester}>

@@ -8,9 +8,7 @@ export default function ShowCourses({
   onSelect: (course: CourseData) => void;
 }>) {
   return (
-    <div
-      className="flex flex-col gap-2"
-      onMouseDown={(e) => e.preventDefault()}>
+    <div className="flex flex-col gap-2">
       {courses.map((course) => (
         <div
           onClick={() => onSelect(course)}

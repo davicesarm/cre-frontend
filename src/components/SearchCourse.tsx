@@ -1,29 +1,27 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
 import ShowCourses from "./ShowCourses";
+import { useEffect, useState, useMemo } from "react";
 import { CourseData, CourseDetailed } from "@/types/types";
 import { IoSearch, IoClose } from "react-icons/io5";
 
 export default function SearchCourse({
   courses,
   onSelect,
+  activateLoading,
 }: Readonly<{
   courses: CourseData[];
   onSelect: (course: CourseDetailed) => void;
+  activateLoading: (bool: boolean) => void;
 }>) {
-  const [filteredCourses, setFilteredCourses] = useState<CourseData[]>([]);
   const [showResults, setShowResults] = useState<boolean>(false);
   const [selectedCourse, setSelectedCourse] = useState<CourseData | null>(null);
   const [inputValue, setInputValue] = useState<string>("");
-  const inputRef = useRef<HTMLInputElement>(null);
 
-  const filterCourses = (inputValue: string) => {
-    if (!inputValue.trim()) {
-      setFilteredCourses([]);
-      return;
-    }
-    const filtered = courses
+  const filteredCourses = useMemo(() => {
+    if (!inputValue.trim()) return [];
+
+    return courses
       .filter((course) =>
         course.nome_curso
           .toLowerCase()
@@ -42,25 +40,21 @@ export default function SearchCourse({
 
         return aLower.localeCompare(bLower);
       });
-
-    setFilteredCourses(filtered);
-  };
+  }, [inputValue, courses]);
 
   useEffect(() => {
     if (!selectedCourse) return;
 
+    activateLoading(true);
     fetch(
       `${process.env.NEXT_PUBLIC_API_LINK}/curso/id/${selectedCourse.id_curso}`
     )
       .then((response) => response.json())
-      .then((courseData) => onSelect(courseData));
+      .then((courseData) => onSelect(courseData))
+      .finally(() => activateLoading(false));
 
     setInputValue(selectedCourse.nome_curso);
-  }, [selectedCourse]);
-
-  useEffect(() => {
-    filterCourses(inputValue);
-  }, [inputValue]);
+  }, [selectedCourse, onSelect, activateLoading]);
 
   return (
     <div className="w-2xs flex flex-col items-center">
@@ -70,21 +64,18 @@ export default function SearchCourse({
       <div className="relative w-full">
         <div className="relative">
           <input
-            ref={inputRef}
             className="w-full text-sm focus:outline-none border focus:border-neutral-500 border-neutral-700 py-2 px-4 bg-neutral-800 rounded-full"
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onBlur={() => setShowResults(false)}
+            onBlur={() => setTimeout(() => setShowResults(false), 110)}
             onFocus={() => setShowResults(true)}
           />
           <div className="text-neutral-400 absolute end-4 top-1/2 -translate-y-1/2 flex">
             {(inputValue && (
               <IoClose
                 className="hover:cursor-pointer"
-                onClick={() => {
-                  setInputValue("");
-                }}
+                onClick={() => setInputValue("")}
               />
             )) || <IoSearch />}
           </div>
@@ -93,10 +84,7 @@ export default function SearchCourse({
           <div className="z-10 max-h-96 overflow-y-scroll absolute w-full border border-neutral-700 p-2 rounded bg-neutral-800/75 backdrop-blur mt-2">
             <ShowCourses
               courses={filteredCourses.slice(0, 15)}
-              onSelect={(course) => {
-                setSelectedCourse(course);
-                inputRef.current?.blur();
-              }}
+              onSelect={(course) => setSelectedCourse(course)}
             />
           </div>
         )}
