@@ -6,7 +6,7 @@ Este é o repositório do frontend da **Calculadora de CRE** desenvolvida em **N
 - Exibe os cursos e disciplinas do **IFPB**.
 - Calcula o **Coeficiente de Rendimento Escolar (CRE)** com base nas notas e cargas horárias das disciplinas.
 - Interface dinâmica e responsiva.
-- Integração com um backend em Flask para obter informações atualizadas.
+- Integração com um [backend em Flask](https://github.com/davicesarm/cre-backend) para obter informações atualizadas.
 
 ## 🚀 Tecnologias
 - **Next.js**
