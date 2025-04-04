@@ -1,8 +1,8 @@
 "use client";
 
-import SearchCourse from "@/components/SearchCourse";
+import SearchCourse from "@/components/search/SearchCourse";
 import SelectSemester from "@/components/SelectSemester";
-import SubjectsForm from "@/components/SubjectsForm";
+import SubjectsForm from "@/components/form/SubjectsForm";
 import { useEffect, useState, useMemo, useCallback } from "react";
 import { CourseDetailed, CourseData } from "@/types/types";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
