@@ -23,7 +23,7 @@ export default function CreInput({
           <p className="text-neutral-300 top-4 text-xs absolute border border-neutral-700 p-2 rounded bg-neutral-800/75 backdrop-blur">
             <em>
               Para obter o CRE geral é necessário informar o valor atual do CRE.
-              Sem isso o cálculo será apenas da etapa.
+              Sem isso o cálculo será apenas do período.
             </em>
           </p>
         )}

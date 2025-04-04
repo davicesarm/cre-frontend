@@ -56,6 +56,13 @@ export default function SearchCourse({
     setInputValue(selectedCourse.nome_curso);
   }, [selectedCourse, onSelect, activateLoading]);
 
+  const scrollToInput = (element: HTMLInputElement) => {
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <div className="w-2xs flex flex-col items-center">
       <h2 className="mb-2 text-center w-full">
@@ -65,11 +72,18 @@ export default function SearchCourse({
         <div className="relative">
           <input
             className="w-full text-sm focus:outline-none border focus:border-neutral-500 border-neutral-700 py-2 px-4 bg-neutral-800 rounded-full"
+            placeholder="Digite o nome do curso"
             type="text"
             value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            onBlur={() => setTimeout(() => setShowResults(false), 110)}
-            onFocus={() => setShowResults(true)}
+            onChange={(e) => {
+              setInputValue(e.target.value);
+              scrollToInput(e.target);
+            }}
+            onBlur={() => setShowResults(false)}
+            onFocus={(e) => {
+              setShowResults(true);
+              scrollToInput(e.target);
+            }}
           />
           <div className="text-neutral-400 absolute end-4 top-1/2 -translate-y-1/2 flex">
             {(inputValue && (
