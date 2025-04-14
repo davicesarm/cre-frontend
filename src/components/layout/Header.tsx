@@ -17,7 +17,7 @@ export default function Header() {
       />
       <div>
         <h1 className="text-4xl font-bold">Calcule seu CRE</h1>
-        <p className="text-neutral-400">Coeficiente de renda escolar</p>
+        <p className="text-neutral-400">Coeficiente de rendimento escolar</p>
       </div>
     </header>
   );
